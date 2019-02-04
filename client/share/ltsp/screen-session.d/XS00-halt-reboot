@@ -1,0 +1,14 @@
+# See if a reboot/halt was requested in the last session
+
+[ ! -f /var/run/ltsp-logout-action ] && return 0
+
+case "$(cat /var/run/ltsp-logout-action)" in
+        REBOOT)
+            exec reboot
+            ;;
+        HALT)
+            exec poweroff
+            ;;
+	*) rm -f /var/run/ltsp-logout-action
+            ;;
+esac
