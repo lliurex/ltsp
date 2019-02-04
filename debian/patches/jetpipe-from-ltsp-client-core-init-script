@@ -1,0 +1,82 @@
+Author: Vagrant Cascadian <vagrant@debian.org>
+Bug-Debian: http://bugs.debian.org/700881
+Upstream-Bug: https://bugs.launchpad.net/ltsp/+bug/996533
+
+Start jetpipe from ltsp-client-core init script, as it fails to daemonize when
+executed from init-ltsp.d, which is run before /sbin/init is started.
+
+Index: ltsp/client/initscripts/ltsp-core
+===================================================================
+--- ltsp.orig/client/initscripts/ltsp-core	2013-11-05 13:06:00.011606123 -0500
++++ ltsp/client/initscripts/ltsp-core	2013-11-05 13:06:02.591618929 -0500
+@@ -35,6 +35,33 @@
+ . /lib/lsb/init-functions
+ . /usr/share/ltsp/ltsp-init-common
+ 
++start_printers() {
++for I in 0 1 2; do
++    eval PRINTER_DEVICE=\$\{PRINTER_${I}_DEVICE\}
++    if [ -n "${PRINTER_DEVICE}" ]; then
++        eval PORT=\$\{PRINTER_${I}_PORT:="910${I}"\} 
++        eval BAUD=\$\{PRINTER_${I}_SPEED:-"9600"\}
++        eval SIZE=\$\{PRINTER_${I}_DATABITS:-"8"\}
++        eval PARITY=\$\{PRINTER_${I}_PARITY:-"none"\}
++        eval FLOW=\$\{PRINTER_${I}_FLOWCTRL:-"soft"\}
++
++        JETPIPE_ARGS=
++        [ -n "$BAUD" ] && JETPIPE_ARGS="${JETPIPE_ARGS} -b ${BAUD}"
++        [ -n "$SIZE" ] && JETPIPE_ARGS="${JETPIPE_ARGS} -y ${SIZE}"
++        [ -n "$PARITY" ] && JETPIPE_ARGS="${JETPIPE_ARGS} -p ${PARITY}"
++        if [ -n "$FLOW" ]; then
++            if [ "$FLOW" = "soft" ]; then
++                JETPIPE_ARGS="${JETPIPE_ARGS} -x"  
++            else
++                JETPIPE_ARGS="${JETPIPE_ARGS} -r" 
++            fi
++        fi
++
++        /usr/sbin/jetpipe ${JETPIPE_ARGS} ${PRINTER_DEVICE} ${PORT}
++    fi
++done
++}
++
+ case "$1" in
+   start)
+         log_action_begin_msg "Starting LTSP client..."
+@@ -48,6 +75,7 @@
+             /bin/plymouth quit --retain-splash || true
+         fi
+ 
++        start_printers || true
+         start_screen_sessions || true
+         start_sound || true
+ 
+Index: ltsp/client/share/ltsp/init-ltsp.d/50-jetpipe
+===================================================================
+--- ltsp.orig/client/share/ltsp/init-ltsp.d/50-jetpipe	2013-11-05 13:06:00.011606123 -0500
++++ /dev/null	1970-01-01 00:00:00.000000000 +0000
+@@ -1,24 +0,0 @@
+-for I in 0 1 2; do
+-    eval PRINTER_DEVICE=\$\{PRINTER_${I}_DEVICE\}
+-    if [ -n "${PRINTER_DEVICE}" ]; then
+-        eval PORT=\$\{PRINTER_${I}_PORT:="910${I}"\} 
+-        eval BAUD=\$\{PRINTER_${I}_SPEED:-"9600"\}
+-        eval SIZE=\$\{PRINTER_${I}_DATABITS:-"8"\}
+-        eval PARITY=\$\{PRINTER_${I}_PARITY:-"none"\}
+-        eval FLOW=\$\{PRINTER_${I}_FLOWCTRL:-"soft"\}
+-
+-        JETPIPE_ARGS=
+-        [ -n "$BAUD" ] && JETPIPE_ARGS="${JETPIPE_ARGS} -b ${BAUD}"
+-        [ -n "$SIZE" ] && JETPIPE_ARGS="${JETPIPE_ARGS} -y ${SIZE}"
+-        [ -n "$PARITY" ] && JETPIPE_ARGS="${JETPIPE_ARGS} -p ${PARITY}"
+-        if [ -n "$FLOW" ]; then
+-            if [ "$FLOW" = "soft" ]; then
+-                JETPIPE_ARGS="${JETPIPE_ARGS} -x"  
+-            else
+-                JETPIPE_ARGS="${JETPIPE_ARGS} -r" 
+-            fi
+-        fi
+-
+-        /usr/sbin/jetpipe ${JETPIPE_ARGS} ${PRINTER_DEVICE} ${PORT} &
+-    fi
+-done

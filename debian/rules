@@ -1,0 +1,83 @@
+#!/usr/bin/make -f
+
+include /usr/share/dpkg/vendor.mk
+include /usr/share/dpkg/architecture.mk
+include /usr/share/dpkg/pkg-info.mk
+
+export DEB_BUILD_MAINT_OPTIONS=hardening=+all
+
+ifneq ($(DEB_BUILD_GNU_TYPE),$(DEB_HOST_GNU_TYPE))
+export CROSS_COMPILE ?= $(DEB_HOST_GNU_TYPE)-
+endif
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+	cd server/man; ./configure ; cd -
+ifeq ($(DEB_HOST_ARCH_OS),linux)
+	cd client/nbd-proxy; ./configure --prefix=/usr --libexecdir=/usr/lib --host=$(DEB_HOST_GNU_TYPE) ; cd -
+endif
+
+	$(MAKE) CC=$(CROSS_COMPILE)gcc -C client/getltscfg
+	DEB_VERSION="$(DEB_VERSION)" VENDOR="$(DEB_VENDOR)" $(MAKE) -C server/man
+ifeq ($(DEB_HOST_ARCH_OS),linux)
+	$(MAKE) -C client/nbd-proxy
+endif
+
+override_dh_autoreconf_clean:
+	# some Makefiles need to run before dh_autoreconf_clean removes files they
+	# would use.
+
+ifeq ($(DEB_HOST_ARCH_OS),linux)
+	[ ! -f client/nbd-proxy/Makefile ] || $(MAKE) -C client/nbd-proxy clean
+endif
+	dh_autoreconf_clean
+
+override_dh_clean:
+	[ ! -f client/getltscfg/Makefile ] || $(MAKE) -C client/getltscfg clean
+
+	# Using po specific Makefile to clean message catalogs
+	$(MAKE) -C po clean
+
+	chmod +x debian/bugs/ltsp-server/script
+
+	dh_clean
+
+override_dh_installinit:
+	# Copy default and init scripts from upstream code
+	cp $(CURDIR)/client/initscripts/ltsp-core $(CURDIR)/debian/ltsp-client-core.init
+	cp $(CURDIR)/client/Ubuntu/initscripts/ltsp-core.upstart $(CURDIR)/debian/ltsp-client-core.upstart
+	dh_installinit -a --no-start
+
+override_dh_install:
+	dh_install
+ifeq ($(DEB_HOST_ARCH_OS),linux)
+	mkdir -p $(CURDIR)/debian/ltsp-client-core/usr/sbin/
+	install -m 755 client/nbd-proxy/src/nbd-proxy $(CURDIR)/debian/ltsp-client-core/usr/sbin/nbd-proxy
+	install -m 755 client/nbd-proxy/src/nbd-client-proxy $(CURDIR)/debian/ltsp-client-core/usr/sbin/nbd-client-proxy
+endif
+	# manually install some cruft
+	mkdir -p $(CURDIR)/debian/ltsp-client-core/usr/share/ltsp/
+	mkdir -p $(CURDIR)/debian/ltsp-server/usr/share/ltsp/
+	install -m 644 common/ltsp-common-functions $(CURDIR)/debian/ltsp-client-core/usr/share/ltsp/ltsp-client-common-functions
+	sed -i -e "s/ltsp_tool 1.0/ltsp_tool $(DEB_VERSION)/" $(CURDIR)/debian/ltsp-client-core/usr/share/ltsp/ltsp-client-common-functions
+	install -m 644 common/ltsp-common-functions $(CURDIR)/debian/ltsp-server/usr/share/ltsp/ltsp-server-common-functions
+	sed -i -e "s/ltsp_tool 1.0/ltsp_tool $(DEB_VERSION)/" $(CURDIR)/debian/ltsp-server/usr/share/ltsp/ltsp-server-common-functions
+	# ship a copy of ltsp-server-vendor-functions as
+	# ltsp-client-vendor-functions... no, really!
+	install -m 644 server/Debian/share/ltsp/ltsp-server-vendor-functions $(CURDIR)/debian/ltsp-client-core/usr/share/ltsp/ltsp-client-vendor-functions
+
+	# install appropriate update-kernels.conf
+	mkdir -p $(CURDIR)/debian/ltsp-client-core/etc/ltsp/
+	install -m 644 client/$(DEB_VENDOR)/etc/ltsp/update-kernels.conf $(CURDIR)/debian/ltsp-client-core/etc/ltsp/update-kernels.conf
+
+	# Using po specific Makefile to install message catalogs
+	$(MAKE) -C po install DESTDIR=$(CURDIR)/debian/ltsp-server/
+
+override_dh_autoreconf:
+	dh_autoreconf ./debian/autogen.sh
+
+override_dh_gencontrol:
+	./debian/x-vendor-substvars $(DEB_VENDOR)
+	dh_gencontrol
