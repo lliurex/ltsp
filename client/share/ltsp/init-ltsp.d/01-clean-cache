@@ -1,5 +1,0 @@
-# Make sure our cache dir is there
-mkdir -p /run/ltsp
-
-# Also delete the cache files in case they exist in the underlying root rofs.
-rm -f /run/ltsp/ltsp_config /run/ltsp/ltsp_config_env

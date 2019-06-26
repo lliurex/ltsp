@@ -1,3 +1,0 @@
-if [ -s /var/cache/debconf/passwords.dat ]; then
-    tee /var/cache/debconf/passwords.dat </dev/null
-fi
