@@ -1,0 +1,27 @@
+# Remove some autostarted services that we don't want in fat clients sessions.
+# RM_SESSION_SERVICES and KEEP_SESSION_SERVICES are space separated lists that
+# can be used in lts.conf to remove or keep autostarted items.
+
+allowed_services() {
+    local service
+
+    echo "$@" | sed 's/#.*//' | while read service; do
+        case " $KEEP_SESSION_SERVICES " in
+            *" $service "*)
+                ;;
+            *)
+                echo -n " $service"
+                ;;
+        esac
+    done
+}
+
+rm_services="$(allowed_services "$RM_SESSION_SERVICES
+at-spi-dbus-bus         # AT-SPI D-Bus Bus
+gnome-software-service  # GNOME Software
+update-notifier         # Check for available updates automatically
+")"
+
+for service in $rm_services; do
+    rm -f "/etc/xdg/autostart/$service.desktop" "/usr/share/upstart/xdg/autostart/$service.desktop"
+done

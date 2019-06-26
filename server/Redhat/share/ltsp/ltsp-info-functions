@@ -1,0 +1,14 @@
+server_packages() {
+    echo server packages:
+    COLUMNS=200 rpm -qa | sort | awk '/ltsp|ldm/{print $1}'
+    echo
+}
+
+chroot_packages() {
+    chroot=$1
+    if [ -f $chroot/var/lib/rpm/Packages ]; then
+        echo "packages in chroot: $chroot"
+        COLUMNS=200 rpm --root=$chroot -qa | sort | awk '/ltsp-client|ldm|ltspfs/{print $1}'
+        echo
+    fi
+}
