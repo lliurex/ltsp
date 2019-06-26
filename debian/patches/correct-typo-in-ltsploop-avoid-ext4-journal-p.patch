@@ -1,0 +1,24 @@
+From 5dcca1e8dcd864669ffa1cb36d89f832077a7243 Mon Sep 17 00:00:00 2001
+From: Alkis Georgopoulos <alkisg@gmail.com>
+Date: Sat, 25 May 2019 09:49:38 +0300
+Subject: Debian: correct typo in ltsploop, avoid ext4 journal
+ playback errors.
+
+---
+ client/Debian/share/initramfs-tools/scripts/nfs-bottom/ltsploop | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/client/Debian/share/initramfs-tools/scripts/nfs-bottom/ltsploop b/client/Debian/share/initramfs-tools/scripts/nfs-bottom/ltsploop
+index 595e56ba..12bc4601 100755
+--- a/client/Debian/share/initramfs-tools/scripts/nfs-bottom/ltsploop
++++ b/client/Debian/share/initramfs-tools/scripts/nfs-bottom/ltsploop
+@@ -45,5 +45,5 @@ if [ -f "${rootmnt}/${ltsploop}" ]; then
+    mount -o move ${rootmnt} /ltsploop
+    mkdir -p ${rootmnt}
+    # TODO filesystem detection
+-   mount -o ltsploop -t ${ltsploopfs} /ltsploop/${ltsploop} ${rootmnt}
++   mount -o loop,ro -t ${ltsploopfs} /ltsploop/${ltsploop} ${rootmnt}
+ fi
+-- 
+2.20.1
+

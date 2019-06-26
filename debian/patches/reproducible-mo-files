@@ -1,0 +1,15 @@
+Avoid always checking weather the .pot file should be regenerated.
+
+Index: ltsp/po/Makefile
+===================================================================
+--- ltsp.orig/po/Makefile
++++ ltsp/po/Makefile
+@@ -16,7 +16,7 @@ DESTDIR=/
+ %.po: $(DOMAIN).pot
+ 	msgmerge -U $*.po $(DOMAIN).pot
+ 
+-$(DOMAIN).pot: $(GETTEXTFILES)
++$(DOMAIN).pot:
+ 	$(shell xgettext -L Shell -o $(DOMAIN).pot $(GETTEXTFILES))
+ 
+ update-po:

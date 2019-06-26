@@ -1,0 +1,33 @@
+From e7c0ed4201d06a4d2fe4f686352c4a74a6eb3a47 Mon Sep 17 00:00:00 2001
+From: Wolfgang Schweer <wschweer@arcor.de>
+Date: Wed, 20 Mar 2019 19:50:13 +0100
+Subject: ltsp: codename detection code not useful for stable
+ (Closes: #925173).
+
+While it made sense to use /etc/debian_release in testing (the file contains
+text like 'buster/sid') it fails to work in stable (the file content is a plain
+version number like 9.8). 'lsb_release --short --codename' is supposed to work
+in stable also in standalone mode.
+
+(Vagrant Cascadian made minor edit to use longhand options consistent
+with upstream).
+---
+ .../plugins/ltsp-build-client/Debian/000-basic-configuration    | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/server/share/ltsp/plugins/ltsp-build-client/Debian/000-basic-configuration b/server/share/ltsp/plugins/ltsp-build-client/Debian/000-basic-configuration
+index 30d04dcf..d075d9df 100644
+--- a/server/share/ltsp/plugins/ltsp-build-client/Debian/000-basic-configuration
++++ b/server/share/ltsp/plugins/ltsp-build-client/Debian/000-basic-configuration
+@@ -2,7 +2,7 @@ case "$MODE" in
+     configure)
+         ARCH=${ARCH:-"$(dpkg --print-architecture)"}
+         APT_GET_OPTS=${APT_GET_OPTS:-"-y"}
+-        DIST=${DIST:-"$(cat /etc/debian_version | cut -d'/' -f1)"}
++        DIST=${DIST:-"$(lsb_release --short --codename)"}
+         MIRROR=${MIRROR:-"http://deb.debian.org/debian"}
+         COMPONENTS=${COMPONENTS:-"main"}
+         EARLY_PACKAGES=${EARLY_PACKAGES:-"ltsp-client"}
+-- 
+2.20.1
+
