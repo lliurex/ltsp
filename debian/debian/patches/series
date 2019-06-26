@@ -1,5 +1,0 @@
-manpages-use-debian-version
-disable-default-encrypted-swap.patch
-reproducible-mo-files
-correct-typo-in-ltsploop-avoid-ext4-journal-p.patch
-fix-codename-detection.patch
