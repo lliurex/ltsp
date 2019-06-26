@@ -1,13 +1,13 @@
 Use the Debian package version when generating manpages with help2man.
 
-Index: ltsp-trunk/server/man/Makefile.am
+Index: ltsp/server/man/Makefile.am
 ===================================================================
---- ltsp-trunk.orig/server/man/Makefile.am	2014-02-04 15:26:16.546570000 -0800
-+++ ltsp-trunk/server/man/Makefile.am	2014-02-04 15:27:31.281910000 -0800
+--- ltsp.orig/server/man/Makefile.am
++++ ltsp/server/man/Makefile.am
 @@ -1,7 +1,7 @@
  dist_man_MANS = ltsp-chroot.8 ltsp-config.8 ltsp-info.1 \
  	ltsp-update-image.8 ltsp-update-kernels.8 ltsp-update-sshkeys.8 \
- 	ltsp-build-client.8
+ 	ltsp-build-client.8 lts.conf.5
 -H2M_COMMON_FLAGS = -N --include="include/common.h2m"
 +H2M_COMMON_FLAGS = -N --version-string=$(DEB_VERSION) --include="include/common.h2m"
  

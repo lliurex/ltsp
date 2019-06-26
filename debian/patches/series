@@ -1,6 +1,0 @@
-use-test-binary
-jetpipe-from-ltsp-client-core-init-script
-manpages-use-debian-version
-disable-default-encrypted-swap.patch
-reproducible-mo-files
-upstream/0001-ltsp-update-image-Exclude-directories-used-by-etckee.patch
