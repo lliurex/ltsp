@@ -1,0 +1,18 @@
+case "$MODE" in
+    commandline)
+            add_option "apt-keys" "`eval_gettext "include the listed keys in the apt keyring"`" "advanced" "true"
+            ;;
+    configure)
+            if [ -n "$option_apt_keys_value" ]; then
+                APT_KEYS="$(echo $option_apt_keys_value | tr ',' ' ')"
+            fi
+            ;;
+    after-install)
+            # add keys to the apt keyring
+            for key in $APT_KEYS ; do
+                # Ensure ASCII-armored key is converted to a binary
+                # gpg key by passing through "gpg --dearmor"
+                gpg --dearmor < $key > $ROOT/etc/apt/trusted.gpg.d/ltsp-$(basename ${key%%.gpg}).gpg
+            done
+            ;;
+esac

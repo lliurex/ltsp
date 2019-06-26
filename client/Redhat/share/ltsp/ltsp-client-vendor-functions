@@ -1,0 +1,8 @@
+# Redhat-specific function overrides for the common functions
+
+# Default path does not include sbin
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
+
+detect_arch() {
+    echo $(uname -m | sed -e s/i.86/i386/)
+}

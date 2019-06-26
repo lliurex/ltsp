@@ -1,0 +1,13 @@
+case "$MODE" in
+    configure)
+        ARCH=${ARCH:-"$(dpkg --print-architecture)"}
+        APT_GET_OPTS=${APT_GET_OPTS:-"-y"}
+        DIST=${DIST:-"$(cat /etc/debian_version | cut -d'/' -f1)"}
+        MIRROR=${MIRROR:-"http://deb.debian.org/debian"}
+        COMPONENTS=${COMPONENTS:-"main"}
+        EARLY_PACKAGES=${EARLY_PACKAGES:-"ltsp-client"}
+        DEBOOTSTRAPOPTS=${DEBOOTSTRAPOPTS:-"--variant=minbase"}
+        BOOTSTRAP=${BOOTSTRAP:-"debootstrap"}
+        ;;
+esac
+

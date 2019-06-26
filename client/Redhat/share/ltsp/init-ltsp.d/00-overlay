@@ -1,0 +1,28 @@
+#!/bin/sh
+
+# "mount --move /sysroot /..." doesn't work on rhel7 and nfs root.
+# Dracut's ltsp module has mounted /tmp as tmpfs, do everything
+# else here. This is tested only with nfs root.
+
+MNT="/tmp/ltsp-mnt"
+UNIONFS_OPT="allow_other,use_ino,suid,dev,nonempty,cow,statfs_omit_ro,max_files=32767"
+
+mkdir ${MNT}
+chmod 700 ${MNT}
+
+# unionfs-mount writable directories
+for dir in /etc /var /root; do
+    mkdir -p ${MNT}${dir}.work ${MNT}${dir}.bind
+    chmod --reference=${dir} ${MNT}${dir}.work ${MNT}${dir}.bind
+    mount -o bind ${dir} ${MNT}${dir}.bind
+    unionfs -o ${UNIONFS_OPT},chroot=${MNT} ${dir}.work=RW:${dir}.bind=RO ${dir}
+done
+
+# tmpfs-mount other directories. /home should be added to lts.conf as FSTAB_1 line.
+for dir in /media /mnt; do
+    mount -t tmpfs -o mode=0755 tmpfs ${dir}
+done
+
+# Save network config files
+mkdir -p /run/ltsp
+mv /tmp/net.* /tmp/dhclient.* /run/ltsp
