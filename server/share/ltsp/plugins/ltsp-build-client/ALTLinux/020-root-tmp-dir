@@ -1,5 +1,0 @@
-case "$MODE" in
-    install)
-	[ -d "$ROOT"/tmp/.private/root ] || install -d -m 0700 "$ROOT"/tmp/.private/root
-        ;;
-esac

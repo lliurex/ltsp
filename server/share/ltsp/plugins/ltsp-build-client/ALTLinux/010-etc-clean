@@ -1,5 +1,0 @@
-case "$MODE" in
-    after-install)
-	rm -f "$ROOT"/etc/apt/sources.list.rpmnew
-        ;;
-esac

@@ -1,2 +1,0 @@
-env | sort -V | sed -n 's/^INIT_COMMAND_[^=]*=//p' > /run/ltsp/init-commands
-. /run/ltsp/init-commands
