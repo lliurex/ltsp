@@ -1,14 +1,139 @@
-ltsp (5.5.10-1build1+lliurex1) bionic; urgency=high
+ltsp (5.18.12+t201905250652~ubuntu18.04.1+lliurex1) bionic; urgency=medium
 
-  * LliureX remix. Adding plasma-workspace dependency
+  * LliureX build
 
- -- Hector Garcia Huerta <hectorgh@gmail.com>  Mon, 04 Feb 2019 17:05:23 +0100
+ -- Hector Garcia Huerta <hectorgh@gmail.com>  Thu, 27 Jun 2019 00:12:09 +0200
 
-ltsp (5.5.10-1build1) bionic; urgency=medium
+ltsp (5.18.12+t201905250652~ubuntu18.04.1) bionic; urgency=low
 
-  * No-change rebuild to pick up the shared flex library.
+  * Auto build.
 
- -- Matthias Klose <doko@ubuntu.com>  Tue, 20 Feb 2018 07:04:13 +0000
+ -- Alkis Georgopoulos <alkisg@gmail.com>  Sat, 25 May 2019 06:58:09 +0000
+
+ltsp (5.18.12-1) unstable; urgency=medium
+
+  * New upstream version.
+
+  [ Alkis Georgopoulos ]
+  * Avoid client hang on shutdown (LP: #1781783).
+  * Resolve systemd-networkd issues (LP: #1756260).
+  * Move rofs,cow to /run/initramfs to prevent systemd from unmounting
+    them on shutdown.
+  * init-ltsp.d/50-systemd-shutdown replaced nbd-disconnect.
+  * Drop Ubuntu diff from debian/control.
+  * Add X-Ubuntu-Depends: ldm-ubuntu-theme for ltsp-client.
+  * Add snap and swapfile to ltsp-update-image.excludes.
+  * At 50-system-shutdown, pid 1 is init-ltsp, not systemd.
+  * Introduce HOST_TO_USERNAME lts.conf directive (LP: #1781774).
+  * Exclude system journal from the generated image (LP: #1781820).
+  * Allow backslashes in usernames (LP: #1652260).
+  * ltsp-config dnsmasq --enable-dns, assumes the default is port=0.
+  * Introduce ltsp-client-core.postinst to call update-kernels.
+  * Default to IPAPPEND=3 for ProxyDHCP.
+  * Properly create rc.local if needed (LP: #1782080).
+  * Add epoptes to RM_SYSTEM_SERVICES.
+  * Move the ldm-ubuntu-theme dependency to ldm.
+  * Update 50-rm-system-services for Ubuntu 18.04.
+  * Debian: don't ifdown the interfaces on shutdown.
+  * Avoid getty@.service for all VTs except the first.
+  * Ubuntu: disable apparmor on fat clients as it crashes libreoffice
+    (LP: #1783066).
+  * Debian: add apt-daily.timer to RM_SYSTEM_SERVICES.
+  * Ubuntu: disable some new unnecessary cronjobs.
+  * 10-resolv-conf: Domains, not Domain (LP: #1795985).
+  * 10-resolv-conf: start comment with #, thanks Hyperbyte!
+
+  [ Vagrant Cascadian ]
+  * server/man: Add lts.conf manpage, generated with go-md2man.
+  * lts.conf manpage: Update references to /dev/usb/lp0. Thanks to
+    Wolfgang Schweer. (Closes: #795620).
+
+  [ Wolfgang Schweer ]
+  * Make 'ltsp-build-client/Debian/000-basic-configuration' more robust.
+  * Adjust server/Debian/share/ltsp/ltsp-build-client-functions to be apt
+    compliant.
+
+  [ Vagrant Cascadian ]
+  * ltsp-build-client-functions: Fix add_mirrors function to only enable
+    trusted=yes for file: entries.
+
+  [ Wolfgang Schweer and Vagrant Cascadian ]
+  * Debian: ltsp-client-builder: Use --nfs-root to enable NFS support, and
+    edit update-kernels.conf.d/nfs. (Closes: #904427).
+
+  [ Wolfgang Schweer ]
+  * Debian: ltsp-client-builder: Create directory update-kernels.conf.d to
+    be able to write the update-kernels.conf.d/nfs file.
+
+  [ Vagrant Cascadian ]
+  * Debian: ltsp-build-client: Ensure configuration directory exists when
+    enabling nfs-root.
+  * Debian: ltsp-build-client: Add --trust-file-mirror commandline option
+    to set [trusted=yes] on file type mirrors. (Closes: #911380).
+  * Sync translations from Launchpad.
+  * Debian: ltsp-build-client: Make TRUST_FILE_MIRROR a boolean.
+  * Install lts.conf man page:
+    - Add Build-Depends on go-md2man.
+    - Add Breaks/Replaces on ltsp-docs.
+    - Drop Suggests/Recommends on ltsp-docs.
+  * Update manpage version patch.
+  * debian/control: Update Standards-Version to 4.3.0, no changes.
+  * debian/control: Update Standards-Version to 4.3.0, no changes.
+  * ltsp-config: prefer installing from /usr/share/ltsp/examples rather
+    than /usr/share/doc/ltsp-server/examples, as relying on contents in
+    doc violates Debian policy, and is potentially very distro-specific.
+  * Move ltsp-server-dnsmaq.conf into common configuration directory.
+  * Update to debhelper compatibility level 11.
+  * ltsp-server: Install ltsp-config examples in /usr/share/ltsp/examples,
+    adding symlinks to /usr/share/doc/ltsp-server/examples/.
+
+ -- Vagrant Cascadian <vagrant@debian.org>  Mon, 24 Dec 2018 17:30:09 -0800
+
+ltsp (5.18.04-2) unstable; urgency=medium
+
+  * Update Maintainer address.
+  * Add patch from upstream to use POSIX awk exponent operator "^".
+
+ -- Vagrant Cascadian <vagrant@debian.org>  Thu, 07 Jun 2018 19:12:44 -0700
+
+ltsp (5.18.04-1) unstable; urgency=medium
+
+  * New upstream version.
+
+  [ Kim B. Heino ]
+  * ltsp-update-kernels: update SELinux context even if in permissive
+    mode.
+  * Add support for multiple log targets in SYSLOG_HOST variable.
+    (LP: #1690824)
+  * ltsp-update-kernels: cleanup also .vmlinuz-*.hmac files.
+  * init-ltsp.d/09-hostname: strip search domains from hostname.
+  * Many updates to Redhat support.
+  * ltsp-update-sshkeys: include ed25519 keys.
+  * 50-set-time: if /etc/localtime is symlink handle it as such.
+
+  [ Alkis Georgopoulos ]
+  * Update Gentoo codebase a bit.
+  * Check that ntpdate exists before calling it.
+  * Prohibit the kernel from removing the ip address.
+  * Fedora: don't set valid_flt=forever when BOOTPROTO=dhcp.
+
+  [ Vagrant Cascadian ]
+  * Sync translations with launchpad.
+  * xfreerdp: Adjust default arguments when called as xfreerdp.
+    (Closes: #819160)
+
+  * Debian packaging:
+    - debian/patches:
+      + Remove patches applied upstream.
+      + Remove ancient, unused kFreeBSD patches.
+    - debian/control:
+      + ltsp-client*: Prefer freerdp2-x11 over other RDP clients.
+        (Closes: #892626)
+      + Update Standards-Version to 4.1.4, no changes needed.
+      + ltsp-client-builder: Depend on console-setup-udeb for both Debian
+        and Ubuntu (Closes: #888583).
+
+ -- Vagrant Cascadian <vagrant@debian.org>  Mon, 23 Apr 2018 18:42:19 -0700
 
 ltsp (5.5.10-1) unstable; urgency=medium
 

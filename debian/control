@@ -1,12 +1,13 @@
 Source: ltsp
 Section: misc
 Priority: optional
-Maintainer: LTSP Debian Maintainers <pkg-ltsp-devel@lists.alioth.debian.org>
+Maintainer: Debian LTSP Maintainers <team+ltsp@tracker.debian.org>
 Uploaders: Vagrant Cascadian <vagrant@debian.org>
 Build-Depends: automake | automaken,
   bison,
-  debhelper (>= 10),
+  debhelper (>= 11),
   flex,
+  go-md2man,
   libfl-dev,
   dctrl-tools,
   libpopt-dev,
@@ -14,7 +15,7 @@ Build-Depends: automake | automaken,
   pkg-config,
   po-debconf,
   help2man
-Standards-Version: 4.1.1
+Standards-Version: 4.3.0
 Vcs-Git: https://git.launchpad.net/ltsp -b debian/master
 Vcs-Browser: https://git.launchpad.net/ltsp
 Homepage: http://ltsp.org
@@ -40,7 +41,6 @@ Suggests: audiooss,
   dnsmasq | isc-dhcp-server | dhcp3-server,
   ldm-server,
   libasound2-plugins,
-  ltsp-docs,
   ltspfs,
   pulseaudio,
   qemu-user-static,
@@ -48,7 +48,8 @@ Suggests: audiooss,
   x11-utils,
   xauth
 Conflicts: ltsp-utils
-Replaces: ltsp-utils
+Breaks: ltsp-docs
+Replaces: ltsp-utils, ltsp-docs
 Architecture: all
 Description: basic LTSP server environment
  This is the basic environment including the minimal features necessary to
@@ -62,23 +63,20 @@ Description: basic LTSP server environment
 Package: ltsp-server-standalone
 Depends: ${misc:Depends},
   ${vendor:Depends},
-  gnupg,
+  dnsmasq (>= 2.41) | tftpd-hpa | atftpd,
   dnsmasq | isc-dhcp-server | dhcp3-server,
+  gnupg,
   ldm-server,
   libasound2-plugins,
   ltspfs,
   ltsp-server (>= ${binary:Version}),
+  plasma-workspace | mate-desktop-environment | gnome-session | x-session-manager | x-window-manager,
   nbd-server (>= 1:2.9.25-2),
   openbsd-inetd | inet-superserver,
   openssh-server,
   squashfs-tools,
-  dnsmasq (>= 2.41) | tftpd-hpa | atftpd,
   x11-utils,
   xauth
-X-Debian-Depends:
-  mate-desktop-environment | gnome-session | x-session-manager | x-window-manager
-X-Ubuntu-Depends: plasma-workspace | gnome-session | mate-desktop-environment | x-session-manager | x-window-manager
-Recommends: ltsp-docs
 Architecture: all
 Description: complete LTSP server environment
  This is a complete LTSP server environment with all LTSP server features
@@ -88,9 +86,6 @@ Description: complete LTSP server environment
  LTSP stands for 'Linux Terminal Server Project'.
 
 Package: ltsp-client-core
-X-Ubuntu-Depends: busybox-static,
-  udhcpc,
-  usbutils
 Pre-Depends: dpkg (>= 1.16.1),
 Depends: ${misc:Depends},
   ${shlibs:Depends},
@@ -114,7 +109,7 @@ Suggests: alsa-utils,
   cron,
   cryptsetup,
   cups-bsd,
-  freerdp-x11 | rdesktop,
+  freerdp2-x11 | freerdp-x11 | rdesktop,
   inputattach [!s390 !s390x] | joystick (<< 20051019-6) [!s390 !s390x],
   ldm,
   libasound2-plugins,
@@ -144,20 +139,13 @@ Description: basic LTSP client environment
  LTSP stands for 'Linux Terminal Server Project'.
 
 Package: ltsp-client
-X-Ubuntu-Depends: dbus,
-  dmz-cursor-theme,
-  language-pack-en,
-  libgl1-mesa-dri,
-  plymouth-theme-ubuntu-logo,
-  plymouth-theme-ubuntu-text,
-  wget
 X-Debian-Depends: cryptsetup
 Depends: ${misc:Depends},
   ${vendor:Depends},
   alsa-utils,
   cron,
   cups-bsd,
-  freerdp-x11 | rdesktop,
+  freerdp2-x11 | freerdp-x11 | rdesktop,
   inputattach [!s390 !s390x] | joystick (<< 20051019-6) [!s390 !s390x],
   ldm,
   libasound2-plugins,
@@ -173,21 +161,7 @@ Depends: ${misc:Depends},
   sshfs,
   x11-xserver-utils,
   xorg
-X-Ubuntu-Recommends: fonts-dejavu-core | ttf-dejavu-core,
-  fonts-freefont-ttf | ttf-freefont,
-  fonts-guru,
-  fonts-kacst-one,
-  fonts-khmeros-core,
-  fonts-lao,
-  fonts-liberation,
-  fonts-nanum,
-  fonts-takao-pgothic,
-  fonts-thai-tlwg | ttf-thai-tlwg,
-  ttf-indic-fonts-core,
-  ttf-ubuntu-font-family,
-  ttf-wqy-microhei
 Recommends: ${vendor:Recommends}
-X-Ubuntu-Suggests: zram-config
 Suggests: ${vendor:Suggests}
 Architecture: any
 Description: complete LTSP client environment
@@ -207,9 +181,8 @@ Architecture: all
 Depends: ${misc:Depends},
   ${shlibs:Depends},
   ${vendor:Depends},
-  pkgsel
-X-Debian-Depends: kbd-chooser
-X-Ubuntu-Depends: console-setup-udeb
+  pkgsel,
+  console-setup-udeb,
 XB-Installer-Menu-Item: 7000
 Description: build an LTSP environment in the installer target
  This udeb bootstraps the LTSP client chroot in the installer target

@@ -47,7 +47,6 @@ override_dh_clean:
 override_dh_installinit:
 	# Copy default and init scripts from upstream code
 	cp $(CURDIR)/client/initscripts/ltsp-core $(CURDIR)/debian/ltsp-client-core.init
-	cp $(CURDIR)/client/Ubuntu/initscripts/ltsp-core.upstart $(CURDIR)/debian/ltsp-client-core.upstart
 	dh_installinit -a --no-start
 
 override_dh_install:

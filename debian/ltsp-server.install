@@ -13,3 +13,6 @@ server/ltsp-chroot  usr/sbin/
 server/ltsp-info usr/bin/
 server/ltsp-config /usr/sbin/
 server/configs/ltsp-update-image.excludes /etc/ltsp/
+server/configs/dhcpd.conf /usr/share/ltsp/examples/
+server/configs/lts.conf /usr/share/ltsp/examples/
+server/configs/ltsp-server-dnsmasq.conf /usr/share/ltsp/examples/
