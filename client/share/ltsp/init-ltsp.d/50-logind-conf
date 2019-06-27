@@ -1,0 +1,8 @@
+# Handle configuration in /etc/systemd/logind.conf
+test -d /etc/systemd || return 0
+
+if grep -qs '^\[Login\]' /etc/systemd/logind.conf; then
+    sed 's/^\[Login\]/&\nNAutoVTs=1\nReserveVT=1/' -i /etc/systemd/logind.conf
+else
+    echo '[Login]\nNAutoVTs=1\nReserveVT=1' >> /etc/systemd/logind.conf
+fi

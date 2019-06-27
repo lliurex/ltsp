@@ -1,0 +1,4 @@
+# Netplan generates /run/netplan which might make networkd unassign our ip.
+# https://bugs.launchpad.net/netplan/+bug/1763608/comments/47
+
+rm -rf /run/netplan

@@ -1,0 +1,26 @@
+#!/bin/sh
+# Work around https://github.com/NetworkBlockDevice/nbd/issues/87
+# Additionally, blockdev may be needed when nbd is not a single partition
+
+PREREQ=""
+
+prereqs()
+{
+    echo "$PREREQ"
+}
+
+case "$1" in
+    prereqs)
+        prereqs
+        exit 0
+        ;;
+esac
+
+# Exit if an LTSP boot was not requested
+grep -qs "init=/sbin/init-ltsp" /proc/cmdline || exit 0
+
+if grep -qs 'systemd-mark$' /scripts/local-top/nbd; then
+    # Live code patching is ugly, but there's no easy alternative in this case.
+    # At least try to match the whole line, to only patch affected versions.
+    sed 's/^$NBDCLIENT $nbdsrv -N $nbdpath $nbdport $nbdrootdev -swap -persist -systemd-mark$/& -b 512; blockdev --rereadpt $nbdrootdev/' -i /scripts/local-top/nbd
+fi

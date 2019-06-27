@@ -1,0 +1,9 @@
+# This script sets device options using the X_OPTION_* lts.conf vars
+
+dev_options=$(env | sort -V | sed -n 's/^X_OPTION_[^=]*=/        Option /p')
+
+if [ -n "$dev_options" ]; then
+    device_hacks="$device_hacks set_dev_options"
+    CONFIGURE_X="True"
+    set_dev_options() { echo "$dev_options"; }
+fi
