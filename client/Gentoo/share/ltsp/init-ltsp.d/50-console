@@ -1,3 +1,0 @@
-if [ -n "$CONSOLE_KEYMAP" ]; then
-    sed -i "s/keymap=\"us\"/keymap=\"${CONSOLE_KEYMAP}\"/" /etc/conf.d/keymaps
-fi

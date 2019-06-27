@@ -1,8 +1,0 @@
-# Don't ifdown the interfaces on shutdown
-for service in /lib/systemd/system/ifup@.service \
-    /lib/systemd/system/networking.service
-do
-    if grep -qs '^ExecStop=.*ifdown' "$service"; then
-        sed "s,^ExecStop=.*ifdown[^#]*,& --exclude=$DEVICE," -i "$service"
-    fi
-done

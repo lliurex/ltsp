@@ -1,8 +1,0 @@
-# Source /run/ltsp/ltsp_config
-if [ -f /run/ltsp/ltsp_config ]; then
-    set -a
-    . /run/ltsp/ltsp_config
-    set +a
-    cat /run/ltsp/ltsp_config >> ${ltsp_config_env} || true
-fi
-
