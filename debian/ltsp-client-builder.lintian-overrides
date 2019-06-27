@@ -1,3 +1,0 @@
-# udebs are frequently empty packages.
-# http://bugs.debian.org/576581
-ltsp-client-builder udeb: empty-binary-package
