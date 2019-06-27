@@ -1,0 +1,2 @@
+rm_conffile /etc/init.d/ltsp-client-setup 5.5.4-3~
+rm_conffile /etc/default/ltsp-client-setup 5.5.4-3~

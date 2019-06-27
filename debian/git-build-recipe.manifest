@@ -1,0 +1,3 @@
+# git-build-recipe format 0.4 deb-version {debupstream}+t201905250652
+lp:ltsp git-commit:31764aa315e8e2d55ea79d270805b596440ec609
+nest-part packaging lp:ltsp debian debian git-commit:8f6112c20d3a72e6d5bcbc9565f0d133b81cee47

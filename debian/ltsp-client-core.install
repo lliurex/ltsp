@@ -1,0 +1,15 @@
+client/share/* /usr/share/
+client/Debian/share/* /usr/share/
+client/getltscfg/getltscfg usr/bin
+client/localapps/ltsp-open /usr/bin/
+client/jetpipe/jetpipe  usr/sbin
+client/initscripts/ltsp-init-common usr/share/ltsp
+client/initscripts/ltsp-bindmounts usr/share/ltsp
+client/localapps/ltsp-localappsd /usr/bin/
+client/localapps/ltsp-genmenu /usr/bin/
+client/localapps/ldm-rc.d/* /usr/share/ldm/rc.d/
+client/localapps/ltsp-remoteapps /usr/bin/
+client/localapps/ltsp-remoteappsd /usr/share/ltsp/
+client/init-ltsp sbin
+client/udev/ltsp-sound lib/udev/
+client/Ubuntu/share/ltsp/init-ltsp.d/50-update-motd /usr/share/ltsp/init-ltsp.d/

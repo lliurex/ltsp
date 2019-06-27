@@ -1,0 +1,3 @@
+manpages-use-debian-version
+disable-default-encrypted-swap.patch
+reproducible-mo-files
