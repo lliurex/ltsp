@@ -1,3 +1,9 @@
+ltsp (5.18.12+t201905250652~ubuntu18.04.1-lliurex2) bionic; urgency=medium
+
+  * Lliurex release
+
+ -- Hector Garcia Huerta <hectorgh@gmail.com>  Thu, 27 Jun 2019 13:09:58 +0200
+
 ltsp (5.18.12+t201905250652~ubuntu18.04.1) bionic; urgency=low
 
   * Auto build.
