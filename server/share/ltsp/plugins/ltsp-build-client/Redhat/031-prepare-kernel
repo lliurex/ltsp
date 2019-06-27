@@ -1,5 +1,0 @@
-case "$MODE" in
-    after-install)
-        ltsp-chroot -a $ARCH /sbin/dracut --force --regenerate-all
-        ;;
-esac

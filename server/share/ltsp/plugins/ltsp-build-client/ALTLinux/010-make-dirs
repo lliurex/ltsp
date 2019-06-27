@@ -1,5 +1,0 @@
-case "$MODE" in
-    after-install)
-        mkdir -p $ROOT/var/lib/hotplug
-        ;;
-esac
