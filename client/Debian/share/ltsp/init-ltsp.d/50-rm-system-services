@@ -1,0 +1,127 @@
+# Remove some system services that don't make sense in live sessions.
+# The user can add more items by declaring space separated RM_SYSTEM_SERVICES
+# or RM_THIN_SYSTEM_SERVICES lists in lts.conf.
+# The RM_THIN_SYSTEM_SERVICES list is ignored by fat clients.
+# KEEP_SYSTEM_SERVICES is a space separated whitelist of services.
+
+test -x /bin/systemctl || return 0
+
+allowed_services() {
+    local service
+
+    echo "$@" | sed 's/#.*//' | tr ' ' '\n' | sort -u | while read service; do
+        case " $KEEP_SYSTEM_SERVICES " in
+            *" $service "*)
+                ;;
+            *)
+                echo -n " $service"
+                ;;
+        esac
+    done
+}
+
+# $RM_SYSTEM_SERVICES are removed for all clients
+rm_services="$(allowed_services "$RM_SYSTEM_SERVICES
+# From Ubuntu 18.04 /lib/systemd/system:
+alsa-restore          # Save/Restore Sound Card State
+alsa-state            # Manage Sound Card State (restore and store)
+apparmor              # AppArmor initialization
+apt-daily             # Daily apt download activities
+apt-daily.timer       # Daily apt download activities
+apt-daily-upgrade     # Daily apt upgrade and clean activities
+apt-daily-upgrade.timer           # Daily apt upgrade and clean activities
+display-manager       # Common symlink for all display managers
+dnsmasq               # A lightweight DHCP and caching DNS server
+epoptes               # Computer lab monitoring tool
+ModemManager          # Modem Manager
+packagekit            # PackageKit Daemon
+packagekit-offline-update         # Update the operating system whilst offline
+ssh                   # OpenBSD Secure Shell server
+systemd-random-seed   # Load/Save Random Seed
+systemd-rfkill        # Load/Save RF Kill Switch Status
+unattended-upgrades   # Unattended Upgrades Shutdown
+ureadahead            # Read required files in advance
+ureadahead-stop       # Stop ureadahead data collection
+x2goserver            # X2Go Server Daemon
+# From Ubuntu 18.04 /etc/init.d (excluding the ones in systemd):
+alsa-utils            # Restore and store ALSA driver settings
+grub-common           # Record successful boot for GRUB
+nbd-server            # Network Block Device server
+# Third party:
+shared-folders        # Sch-scripts shared folders service
+teamviewerd           # TeamViewer remote control daemon
+")"
+
+# $RM_THIN_SYSTEM_SERVICES are removed for thin clients
+if ! boolean_is_true "$LTSP_FATCLIENT"; then
+    rm_services="$rm_services $(allowed_services "$RM_THIN_SYSTEM_SERVICES
+# From Ubuntu 18.04 /lib/systemd/system:
+accounts-daemon       # Accounts Service
+acpid                 # ACPI event daemon
+apport-forward@       # Unix socket for apport crash forwarding
+atd                   # Deferred execution scheduler
+avahi-daemon          # Avahi mDNS/DNS-SD Stack
+bluetooth             # Bluetooth service
+brltty                # Braille Device Support
+configure-printer@    # Configure Plugged-In Printer
+cups                  # CUPS Scheduler
+cups-browsed          # Make remote CUPS printers available locally
+kerneloops            # Collects and submits kernel crash signatures
+NetworkManager        # Network Manager
+NetworkManager-dispatcher         # Network Manager Script Dispatcher Service
+NetworkManager-wait-online        # Network Manager Wait Online
+polkit                # Authorization Manager
+snapd                 # Snappy daemon
+systemd-binfmt        # Set Up Additional Binary Formats
+systemd-logind        # Login Service
+ufw                   # Uncomplicated Firewall
+whoopsie              # crash report submission daemon
+vboxweb               # VirtualBox Web Service
+winbind               # Samba Winbind Daemon
+wpa_supplicant        # WPA supplicant
+wpa_supplicant@       # WPA supplicant daemon (interface-specific version)
+wpa_supplicant-wired@ # WPA (interface- and wired driver-specific version)
+# From Ubuntu 18.04 /etc/init.d (excluding the ones in systemd):
+apport                # automatic crash report generation
+virtualbox            # VirtualBox Linux kernel module
+")"
+fi
+
+# We don't need NFS-related services if we're not using nfs
+if ! grep -q nfs /etc/fstab; then
+    rm_services="$rm_services $(allowed_services "
+auth-rpcgss-module    # Kernel Module supporting RPCSEC_GSS
+nfs-blkmap            # pNFS block layout mapping daemon
+nfs-common            # nfs-config.service  # Preprocess NFS configuration
+nfs-idmapd            # NFSv4 ID-name mapping service
+nfs-kernel-server     # NFS server and services
+nfs-mountd            # NFS Mount Daemon
+nfs-server            # NFS server and services
+nfs-utils             # NFS server and client services
+portmap               # RPC bind portmap service
+rpcbind               # RPC bind portmap service
+rpc-gssd              # RPC security service for NFS client and server
+rpc-statd-notify      # Notify NFS peers of a restart
+rpc-statd             # NFS status monitor for NFSv2/3 locking.
+rpc-svcgssd           # RPC security service for NFS server
+")"
+fi
+
+# Minimize `systemctl disable` errors to not alarm the users
+existing_services=""
+for service in $rm_services; do
+    if [ -f "/lib/systemd/system/$service" ] ||
+       [ -f "/lib/systemd/system/$service.service" ] ||
+       [ -f "/etc/systemd/system/$service" ] ||
+       [ -f "/etc/systemd/system/$service.service" ] ||
+       [ -f "/etc/init.d/$service" ]
+    then
+        existing_services="$existing_services $service"
+    fi
+done
+systemctl disable --quiet --root=/ --no-reload $existing_services
+
+# `systemctl disable display-manager` doesn't remove the alias in 237-3ubuntu10.2
+if echo " $rm_services " | grep -q " display-manager "; then
+    rm -f /etc/systemd/system/display-manager.service
+fi

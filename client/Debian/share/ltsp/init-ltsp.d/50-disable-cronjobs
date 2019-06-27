@@ -1,0 +1,25 @@
+# Disable several cronjobs that are usually present but that 
+# cause unnecessary load.
+
+while read job; do
+    rm -f "$job"
+done <<EOF
+/etc/cron.d/popularity-contest
+/etc/cron.daily/apt
+/etc/cron.daily/apt-compat
+/etc/cron.daily/aptitude
+/etc/cron.daily/cracklib-runtime
+/etc/cron.daily/dpkg
+/etc/cron.daily/logrotate
+/etc/cron.daily/man-db
+/etc/cron.daily/mlocate
+/etc/cron.daily/passwd
+/etc/cron.daily/popularity-contest
+/etc/cron.daily/standard
+/etc/cron.daily/ubuntu-advantage-tools
+/etc/cron.daily/update-notifier-common
+/etc/cron.weekly/apt-xapian-index
+/etc/cron.weekly/man-db
+/etc/cron.weekly/update-notifier-common
+/etc/cron.monthly/ieee-data
+EOF

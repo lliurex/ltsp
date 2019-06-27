@@ -1,0 +1,31 @@
+# get the lts.conf via tftp
+
+if [ -n "$SERVER" ]; then
+    # Decide the lts.conf path ($pathonly)
+    if [ -n "$filename" ]; then
+        # $filename="<path>/pxelinux.0" comes from net-eth0.conf.
+        # If it contains a path, use it. Otherwise, don't insert an initial
+        # slash, as some tftp servers have problems with it.
+        fileonly=${filename##*/}
+        pathonly=${filename%$fileonly}
+    elif [ -n "$NBD_ROOT_NAME" ]; then
+        # $NBD_ROOT_NAME="/opt/ltsp/<chroot>" is parsed from the nbd-client
+        # cmdline by 04-server. Remove "/opt" to get "/ltsp/<chroot>/".
+        pathonly=${NBD_ROOT_NAME#/opt}
+        pathonly=${pathonly%/}/
+    else
+        # Default to "/ltsp/<arch>/".
+        pathonly=/ltsp/$(detect_arch)/
+    fi
+    lts_conf_temp=$(mktemp)
+    tftp -m binary "$SERVER" -c get "$pathonly${LTSCONF:-"lts.conf"}" "$lts_conf_temp" >/dev/null
+    # Only overwrite lts.conf if it has non-zero size
+    if [ -s "$lts_conf_temp" ]; then
+        mv "$lts_conf_temp" /etc/lts.conf
+    else
+        rm "$lts_conf_temp"
+    fi
+fi
+
+# Get the lts.conf vars into the environment
+. /usr/share/ltsp/ltsp_config
